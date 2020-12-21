@@ -144,7 +144,7 @@
 
                     <div class="col-sm-6 col-md-6 col-lg-6">
                       <ul class="info-list">
-                        <li><span class="title">Age</span><span class="value">23</span></li>
+                        <li><span class="title">Age</span><span class="value" id="age">23</span></li>
                         <li><span class="title">Residence</span><span class="value">Indonesia</span></li>
                         <li><span class="title">Address</span><span class="value">Surabaya, Indonesia</span></li>
                         <li><span class="title">e-mail</span><span class="value"><a href="mailto:yusronandrian@gmail.com">yusronandrian@gmail.com</a></span></li>
@@ -1106,7 +1106,7 @@
       <!-- /Main Content -->
     </div>
     <footer>
-      <div class="copyrights">© 2020 All rights reserved. Made by Yusron Andrian</div>
+      <div class="copyrights">© <span id="year"></span> All rights reserved. Made by Yusron Andrian</div>
     </footer>
 
     <script type="text/javascript" src="js/bootstrap.min.js"></script>
@@ -1122,5 +1122,9 @@
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js"></script>
     <script type="text/javascript" src="js/jquery.googlemap.js"></script>
     <script type="text/javascript" src="js/main.js"></script>
+    <script>
+      document.getElementById("year").innerHTML = new Date().getFullYear();
+      document.getElementById("age").innerHTML = new Date().getFullYear()-1997;
+    </script>
   </body>
 </html>
