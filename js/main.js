@@ -1,22 +1,16 @@
 /*
-* Template Name: PRO Card - Material Resume / CV / vCard Template
-* Author: lmpixels
+* Template Name: BreezyCV - Resume / CV / vCard / Portfolio Template
+* Author: LMPixels
 * Author URL: http://themeforest.net/user/lmpixels
-* Version: 1.0
+* Version: 1.3.0
 */
 
 (function($) {
 "use strict";
-    // Subpages resize
-    function subpages_resize() {
-        var subpagesHeight = $('.pt-page-current').height();
-        $(".subpages").height(subpagesHeight + 50);
-    }
-    
     // Portfolio subpage filters
     function portfolio_init() {
-        var portfolio_grid = $('#portfolio_grid'),
-            portfolio_filter = $('#portfolio_filters');
+        var portfolio_grid = $('.portfolio-grid'),
+            portfolio_filter = $('.portfolio-filters');
             
         if (portfolio_grid) {
 
@@ -25,32 +19,57 @@
                 itemSelector: 'figure'
             });
 
-            $('.site-main-menu').on("click", "a", function (e) {
-                portfolio_grid.shuffle('update');
-            });
-
-
             portfolio_filter.on("click", ".filter", function (e) {
                 portfolio_grid.shuffle('update');
                 e.preventDefault();
-                $('#portfolio_filters .filter').parent().removeClass('active');
+                $('.portfolio-filters .filter').parent().removeClass('active');
                 $(this).parent().addClass('active');
                 portfolio_grid.shuffle('shuffle', $(this).attr('data-group') );
-                setTimeout(function(){
-                    subpages_resize();
-                }, 500);
             });
 
         }
     }
     // /Portfolio subpage filters
 
+
+    // Hide Mobile menu
+    function mobileMenuHide() {
+        var windowWidth = $(window).width(),
+            siteHeader = $('#site_header');
+
+        if (windowWidth < 1025) {
+            siteHeader.addClass('mobile-menu-hide');
+            $('.menu-toggle').removeClass('open');
+            setTimeout(function(){
+                siteHeader.addClass('animate');
+            }, 500);
+        } else {
+            siteHeader.removeClass('animate');
+        }
+    }
+    // /Hide Mobile menu
+
+    // Custom scroll
+    function customScroll() {
+        var windowWidth = $(window).width();
+        if (windowWidth > 1024) {
+            $('.animated-section, .single-page-content').each(function() {
+                $(this).perfectScrollbar();
+            });
+        } else {
+            $('.animated-section, .single-page-content').each(function() {
+                $(this).perfectScrollbar('destroy');
+            });
+        }
+    }
+    // /Custom scroll
+
     // Contact form validator
     $(function () {
 
-        $('#contact-form').validator();
+        $('#contact_form').validator();
 
-        $('#contact-form').on('submit', function (e) {
+        $('#contact_form').on('submit', function (e) {
             if (!e.isDefaultPrevented()) {
                 var url = "contact_form/contact_form.php";
 
@@ -65,8 +84,8 @@
 
                         var alertBox = '<div class="alert ' + messageAlert + ' alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>' + messageText + '</div>';
                         if (messageAlert && messageText) {
-                            $('#contact-form').find('.messages').html(alertBox);
-                            $('#contact-form')[0].reset();
+                            $('#contact_form').find('.messages').html(alertBox);
+                            $('#contact_form')[0].reset();
                         }
                     }
                 });
@@ -76,73 +95,60 @@
     });
     // /Contact form validator
 
-    // Hide Mobile menu
-    function mobileMenuHide() {
-        var windowWidth = $(window).width();
-        if (windowWidth < 1024) {
-            $('#site_header').addClass('mobile-menu-hide');
-        }
-    }
-    // /Hide Mobile menu
-
     //On Window load & Resize
     $(window)
         .on('load', function() { //Load
             // Animation on Page Loading
-            $(".preloader").fadeOut("slow");
+            $(".preloader").fadeOut( 800, "linear" );
 
             // initializing page transition.
-            var ptPage = $('.subpages');
+            var ptPage = $('.animated-sections');
             if (ptPage[0]) {
                 PageTransitions.init({
-                    menu: 'ul.site-main-menu',
+                    menu: 'ul.main-menu',
                 });
             }
         })
         .on('resize', function() { //Resize
              mobileMenuHide();
-
-             setTimeout(function(){
-                subpages_resize();
-            }, 500);
-        })
-        .scroll(function () {
-            if ($(window).scrollTop() < 20) {
-                $('.header').removeClass('sticked');
-            } else {
-                $('.header').addClass('sticked');
-            }
-        })
-        .scrollTop(0);
+             $('.animated-section').each(function() {
+                $(this).perfectScrollbar('update');
+            });
+            customScroll();
+        });
 
 
     // On Document Load
     $(document).on('ready', function() {
-        // Initialize Portfolio grid
-        var $portfolio_container = $("#portfolio-grid");
+        var movementStrength = 23;
+        var height = movementStrength / $(document).height();
+        var width = movementStrength / $(document).width();
+        $("body").on('mousemove', function(e){
+            var pageX = e.pageX - ($(document).width() / 2),
+                pageY = e.pageY - ($(document).height() / 2),
+                newvalueX = width * pageX * -1,
+                newvalueY = height * pageY * -1,
+                elements = $('.lm-animated-bg');
 
-        $portfolio_container.imagesLoaded(function () {
-            setTimeout(function(){
-                portfolio_init(this);
-            }, 500);
-        });
+            elements.addClass('transition');
+            elements.css({
+                "background-position": "calc( 50% + " + newvalueX + "px ) calc( 50% + " + newvalueY + "px )",
+            });
 
-        // Portfolio hover effect init
-        $(' #portfolio_grid > figure ').each( function() { $(this).hoverdir(); } );
-
-        // Blog grid init
-        setTimeout(function(){
-            var $container = $(".blog-masonry");
-            $container.masonry();
-        }, 500);
+            setTimeout(function() {
+                elements.removeClass('transition');
+            }, 300);
+        })
 
         // Mobile menu
         $('.menu-toggle').on("click", function () {
+            $('#site_header').addClass('animate');
             $('#site_header').toggleClass('mobile-menu-hide');
+            $('.menu-toggle').toggleClass('open');
         });
 
         // Mobile menu hide on main menu item click
-        $('.site-main-menu').on("click", "a", function (e) {
+        $('.main-menu').on("click", "a", function (e) {
             mobileMenuHide();
         });
 
@@ -151,12 +157,41 @@
             $('#blog-sidebar').toggleClass('open');
         });
 
+        // Initialize Portfolio grid
+        var $portfolio_container = $(".portfolio-grid");
+        $portfolio_container.imagesLoaded(function () {
+            portfolio_init(this);
+        });
+
+        // Blog grid init
+        var $container = $(".blog-masonry");
+        $container.imagesLoaded(function(){
+            $container.masonry();
+        });
+
+        customScroll();
+
+        // Text rotation
+        $('.text-rotation').owlCarousel({
+            loop: true,
+            dots: false,
+            nav: false,
+            margin: 0,
+            items: 1,
+            autoplay: true,
+            autoplayHoverPause: false,
+            autoplayTimeout: 3800,
+            animateOut: 'animated-section-scaleDown',
+            animateIn: 'animated-section-scaleUp'
+        });
+
         // Testimonials Slider
         $(".testimonials.owl-carousel").owlCarousel({
             nav: true, // Show next/prev buttons.
             items: 3, // The number of items you want to see on the screen.
             loop: false, // Infinity loop. Duplicate last and first items to get loop illusion.
             navText: false,
+            autoHeight: true,
             margin: 25,
             responsive : {
                 // breakpoint from 0 up
@@ -177,20 +212,41 @@
             }
         });
 
-
-        // Text rotation
-        $('.text-rotation').owlCarousel({
-            loop: true,
-            dots: false,
-            nav: false,
-            margin: 0,
-            items: 1,
-            autoplay: true,
-            autoplayHoverPause: false,
-            autoplayTimeout: 3800,
-            animateOut: 'zoomOut',
-            animateIn: 'zoomIn'
+        // Clients Slider
+        $(".clients.owl-carousel").imagesLoaded().owlCarousel({
+            nav: true, // Show next/prev buttons.
+            items: 2, // The number of items you want to see on the screen.
+            loop: false, // Infinity loop. Duplicate last and first items to get loop illusion.
+            navText: false,
+            margin: 10,
+            autoHeight: true,
+            responsive : {
+                // breakpoint from 0 up
+                0 : {
+                    items: 2,
+                },
+                // breakpoint from 768 up
+                768 : {
+                    items: 4,
+                },
+                1200 : {
+                    items: 5,
+                }
+            }
         });
+
+
+        //Form Controls
+        $('.form-control')
+            .val('')
+            .on("focusin", function(){
+                $(this).parent('.form-group').addClass('form-group-focus');
+            })
+            .on("focusout", function(){
+                if($(this).val().length === 0) {
+                    $(this).parent('.form-group').removeClass('form-group-focus');
+                }
+            });
 
         // Lightbox init
         $('body').magnificPopup({
@@ -248,31 +304,12 @@
             },
         });
 
-        $('.ajax-page-load-link').magnificPopup({
-            type: 'ajax',
-            removalDelay: 300,
-            mainClass: 'mfp-fade',
-            gallery: {
-                enabled: true
-            },
-        });
-
-        //Form Controls
-        $('.form-control')
-            .val('')
-            .on("focusin", function(){
-                $(this).parent('.form-group').addClass('form-group-focus');
-            })
-            .on("focusout", function(){
-                if($(this).val().length === 0) {
-                    $(this).parent('.form-group').removeClass('form-group-focus');
-                }
-            });
-
         //Google Maps
-        $("#map").googleMap();
+        $("#map").googleMap({
+            zoom: 16 // Google Map ZOOM. You can change this value
+        });
         $("#map").addMarker({
-            address: "15 avenue des champs Elysées 75008 Paris" // Your Address
+            address: "S601 Townsend Street, San Francisco, California, USA", // Your Address. Change it
         });
     });
 
